@@ -11,6 +11,6 @@ public record FlightRequestDTO(
         @JsonProperty("fecha_partida")
         LocalDateTime fechaPartida,
         @JsonProperty("distancia_km")
-        double distaciaKm
+        double distanciaKm
 ) {
 }
