@@ -1,6 +1,7 @@
 package com.flightontime.bff.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -11,13 +12,43 @@ import java.time.LocalDateTime;
 
 @Schema(description = "DTO para la solicitud de predicción de vuelo")
 public record FlightRequestDTO(
-                @Schema(description = "Nombre de la aerolínea", example = "G3") @NotBlank(message = "La aerolinea es obligatoria") String aerolinea,
+        @Schema(description = "Nombre de la aerolínea", example = "G3")
+        @NotBlank(message = "La aerolínea es obligatoria")
+        @Size(min = 2, max = 2, message = "El código de aerolínea debe tener exactamente 2 caracteres (ej: AA, B6)")
+        @Pattern(regexp = "^[A-Z0-9]{2}$", message = "El código de aerolínea debe contener solo letras mayúsculas o números")
+        String aerolinea,
+        
+        @Schema(description = "Aeropuerto de origen", example = "MIA")
+        @NotBlank(message = "El aeropuerto de origen es obligatorio")
+        @Size(min = 3, max = 3, message = "El código IATA debe tener exactamente 3 letras (ej: JFK)")
+        @Pattern(regexp = "^[A-Z]{3}$", message = "El código IATA debe contener solo letras mayúsculas")
+        String origen,
 
-                @Schema(description = "Aeropuerto de origen", example = "MIA") @NotBlank(message = "El origen es obligatorio") String origen,
+        @Schema(description = "Aeropuerto de destino", example = "JFK")
+        @NotBlank(message = "El aeropuerto de destino es obligatorio")
+        @Size(min = 3, max = 3, message = "El código IATA debe tener exactamente 3 letras (ej: LAX)")
+        @Pattern(regexp = "^[A-Z]{3}$", message = "El código IATA debe contener solo letras mayúsculas")
+        String destino,
 
-                @Schema(description = "Aeropuerto de destino", example = "JFK") @NotBlank(message = "El destino es obligatorio") String destino,
+        @FutureOrPresent(message = "La fecha de partida debe ser en el presente o futuro")
+        @Schema(description = "Fecha y hora de partida", example = "2026-01-29T21:15:00")
+        @NotNull(message = "La fecha de partida es obligatoria")
+        @JsonProperty("fecha_partida")
+        LocalDateTime fechaPartida,
 
-                @JsonProperty("fecha_partida") @NotNull(message = "La fecha de partida es obligatoria") @FutureOrPresent(message = "La fecha de partida debe ser en el presente o futuro") @Schema(description = "Fecha y hora de partida", example = "2026-01-29T21:15:00") LocalDateTime fechaPartida,
+        @Schema(description = "Distancia del vuelo en kilómetros", example = "1100")
+        @NotNull(message = "La distancia es obligatoria")
+        @Positive(message = "La distancia debe ser un número positivo")
+        @JsonProperty("distancia_km")
+        Double distanciaKm
+) {
 
-                @JsonProperty("distancia_km") @Positive(message = "La distancia debe ser mayor a 0") @Schema(description = "Distancia del vuelo en kilómetros", example = "1100") double distanciaKm) {
+        public FlightRequestDTO {
+                // Validar que origen y destino no sean iguales
+                if (origen != null && destino != null && origen.equals(destino)) {
+                        throw new IllegalArgumentException(
+                                "El aeropuerto de origen y destino no pueden ser iguales"
+                        );
+                }
+        }
 }
