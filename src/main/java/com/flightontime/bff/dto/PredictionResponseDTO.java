@@ -1,6 +1,5 @@
 package com.flightontime.bff.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "DTO con la respuesta de la predicción")
