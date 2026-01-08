@@ -1,6 +1,7 @@
 package com.flightontime.bff.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.*;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
@@ -44,7 +45,7 @@ public record FlightRequestDTO(
 
         public FlightRequestDTO {
                 // Validar que origen y destino no sean iguales
-                if (origen != null && destino != null && origen.equals(destino)) {
+                if (origen != null && origen.equals(destino)) {
                         throw new IllegalArgumentException(
                                 "El aeropuerto de origen y destino no pueden ser iguales"
                         );
