@@ -128,9 +128,18 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpClientErrorException(
             HttpClientErrorException ex) {
 
+        // 1. Se Obtiene la respuesta del core service
+        String coreResponseBody = ex.getResponseBodyAsString();
+
+        // 2. Se elimina el prefijo "Error datos: " para evitar redundancia
+        String cleanMessage = coreResponseBody.replace("Error datos: ", "");
+
+        // 3. Se define el mensaje final incluyendo el mensaje del core service
+        String finalMessage = "Error del servicio de predicción: " + cleanMessage;
+
         ErrorResponse error = new ErrorResponse(
                 "CORE_SERVICE_ERROR",
-                "Error del servicio de predicción: " + ex.getStatusText(),
+                finalMessage,
                 null
         );
 
