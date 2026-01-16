@@ -35,6 +35,11 @@ public class PredictionClientService {
                 .setScale(2, RoundingMode.HALF_UP)
                 .doubleValue();
 
-        return new PredictionResponseDTO(raw.prevision(), rounded);
+        // Se construye explícitamente el DTO de salida para controlar
+        // errores fuera del flujo de serialización de la respuesta
+        PredictionResponseDTO response =
+                new PredictionResponseDTO(raw.prevision(), rounded);
+
+        return response;
     }
 }
