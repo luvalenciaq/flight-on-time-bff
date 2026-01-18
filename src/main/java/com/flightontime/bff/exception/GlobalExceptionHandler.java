@@ -1,5 +1,6 @@
 package com.flightontime.bff.exception;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -17,6 +18,16 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final CoreErrorTranslator coreErrorTranslator;
+    private final ObjectMapper objectMapper;
+
+    public GlobalExceptionHandler(
+            CoreErrorTranslator coreErrorTranslator,
+            ObjectMapper objectMapper
+    ) {
+        this.coreErrorTranslator = coreErrorTranslator;
+        this.objectMapper = objectMapper;
+    }
     /**
      * Maneja errores de validación de Bean Validation
      * (@NotBlank, @Size, @Pattern, @Positive, etc.)
@@ -128,26 +139,28 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleHttpClientErrorException(
             HttpClientErrorException ex) {
 
-        // 1. Se Obtiene la respuesta del core service
-        String coreResponseBody = ex.getResponseBodyAsString();
+        try {
+            CoreErrorResponse coreError =
+                    objectMapper.readValue(
+                            ex.getResponseBodyAsString(),
+                            CoreErrorResponse.class
+                    );
 
-        // 2. Se elimina el prefijo "Error datos: " para evitar redundancia
-        String cleanMessage = coreResponseBody.replace("Error datos: ", "");
+            return coreErrorTranslator.translate(
+                    coreError,
+                    ex.getStatusCode()
+            );
 
-        // 3. Se define el mensaje final incluyendo el mensaje del core service
-        String finalMessage = "Error del servicio de predicción: " + cleanMessage;
-
-        ErrorResponse error = new ErrorResponse(
-                "CORE_SERVICE_ERROR",
-                finalMessage,
-                null
-        );
-
-        return ResponseEntity
-                .status(ex.getStatusCode())
-                .body(error);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(ex.getStatusCode())
+                    .body(new ErrorResponse(
+                            "CORE_SERVICE_ERROR",
+                            "Error al comunicarse con el servicio de predicción",
+                            null
+                    ));
+        }
     }
-
     /**
      * Maneja cualquier otro error no capturado
      */
