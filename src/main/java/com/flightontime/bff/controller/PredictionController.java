@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,7 @@ public class PredictionController {
             @ApiResponse(responseCode = "500", description = "Error interno del servidor", content = @Content)
     })
     @PostMapping
-    public PredictionResponseDTO predict(@Valid @RequestBody FlightRequestDTO dto) {
-        return predictionClientService.predict(dto);
+    public ResponseEntity<PredictionResponseDTO> predict(@Valid @RequestBody FlightRequestDTO dto) {
+        return ResponseEntity.ok(predictionClientService.predict(dto));
     }
 }
