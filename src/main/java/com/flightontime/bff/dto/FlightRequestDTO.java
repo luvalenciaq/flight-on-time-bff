@@ -34,13 +34,7 @@ public record FlightRequestDTO(
         @Schema(description = "Fecha y hora de partida", example = "2026-01-29T21:15:00")
         @NotNull(message = "La fecha de partida es obligatoria")
         @JsonProperty("fecha_partida")
-        LocalDateTime fechaPartida,
-
-        @Schema(description = "Distancia del vuelo en kilómetros", example = "1100")
-        @NotNull(message = "La distancia es obligatoria")
-        @Positive(message = "La distancia debe ser un número positivo")
-        @JsonProperty("distancia_km")
-        Double distanciaKm
+        LocalDateTime fechaPartida
 ) {
 
         public FlightRequestDTO {
