@@ -1,5 +1,8 @@
 package com.flightontime.bff.exception;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.flightontime.bff.dto.ErrorResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,7 +18,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final ObjectMapper objectMapper;
 
     /**
      * Maneja errores de validación de Bean Validation
@@ -123,20 +129,36 @@ public class GlobalExceptionHandler {
 
     /**
      * Maneja errores HTTP del Core Service
+     * Ahora intenta deserializar el JSON del Core para mantener el mensaje original.
      */
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponse> handleHttpClientErrorException(
             HttpClientErrorException ex) {
 
-        ErrorResponse error = new ErrorResponse(
-                "CORE_SERVICE_ERROR",
-                "Error del servicio de predicción: " + ex.getStatusText(),
-                null
-        );
+        try {
+            // Intentamos leer el cuerpo de la respuesta como nuestro ErrorResponse
+            ErrorResponse coreError = objectMapper.readValue(
+                    ex.getResponseBodyAsString(),
+                    ErrorResponse.class
+            );
 
-        return ResponseEntity
-                .status(ex.getStatusCode())
-                .body(error);
+            // Si funciona, devolvemos el error tal cual lo envió el Core
+            return ResponseEntity
+                    .status(ex.getStatusCode())
+                    .body(coreError);
+
+        } catch (Exception e) {
+            // Si falla la deserialización (el Core no devolvió JSON o estructura válida)
+            // Hacemos Fallback a un error genérico
+            ErrorResponse error = new ErrorResponse(
+                    "CORE_SERVICE_ERROR",
+                    "Error proveniente del servicio Core: " + ex.getStatusText(),
+                    null
+            );
+            return ResponseEntity
+                    .status(ex.getStatusCode())
+                    .body(error);
+        }
     }
 
     /**

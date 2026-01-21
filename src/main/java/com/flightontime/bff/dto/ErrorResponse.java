@@ -1,8 +1,7 @@
-package com.flightontime.bff.exception;
+package com.flightontime.bff.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
