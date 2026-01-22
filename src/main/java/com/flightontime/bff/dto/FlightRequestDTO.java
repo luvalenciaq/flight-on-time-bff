@@ -37,7 +37,6 @@ public record FlightRequestDTO(
         LocalDateTime fechaPartida,
 
         @Schema(description = "Distancia del vuelo en kilómetros", example = "1100")
-        @NotNull(message = "La distancia es obligatoria")
         @Positive(message = "La distancia debe ser un número positivo")
         @JsonProperty("distancia_km")
         Double distanciaKm
