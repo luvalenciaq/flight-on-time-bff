@@ -2,6 +2,7 @@ package com.flightontime.bff.controller;
 
 import com.flightontime.bff.dto.FlightRequestDTO;
 import com.flightontime.bff.dto.PredictionResponseDTO;
+import com.flightontime.bff.dto.PredictionWithFeaturesDTO;
 import com.flightontime.bff.service.PredictionClientService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -32,5 +33,13 @@ public class PredictionController {
     @PostMapping
     public ResponseEntity<PredictionResponseDTO> predict(@Valid @RequestBody FlightRequestDTO dto) {
         return ResponseEntity.ok(predictionClientService.predict(dto));
+    }
+
+    @Operation(summary = "Predecir puntualidad con datos climáticos")
+    @PostMapping("/detailed")
+    public ResponseEntity<PredictionWithFeaturesDTO> predictDetailed(
+            @Valid @RequestBody FlightRequestDTO dto
+    ) {
+        return ResponseEntity.ok(predictionClientService.predictWithWeather(dto));
     }
 }

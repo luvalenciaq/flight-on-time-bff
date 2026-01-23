@@ -3,9 +3,13 @@ package com.flightontime.bff.service;
 import com.flightontime.bff.config.CoreServiceProperties;
 import com.flightontime.bff.dto.FlightRequestDTO;
 import com.flightontime.bff.dto.PredictionResponseDTO;
+import com.flightontime.bff.dto.PredictionWithFeaturesDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
+
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -41,5 +45,34 @@ public class PredictionClientService {
                 new PredictionResponseDTO(raw.prevision(), rounded);
 
         return response;
+    }
+
+    // Predicción CON clima
+    public PredictionWithFeaturesDTO predictWithWeather(FlightRequestDTO dto) {
+        // Construir URL con query parameter
+        String url = props.getUrl() + "/internal/predict/detailed";
+        ResponseEntity<String> rawResponse = restTemplate.postForEntity(url, dto, String.class);
+        System.out.println(rawResponse.getBody());
+
+        PredictionWithFeaturesDTO raw = restTemplate.postForObject(
+                url,
+                dto,
+                PredictionWithFeaturesDTO.class
+        );
+
+        if (raw == null) {
+            return null;
+        }
+
+        double rounded = BigDecimal
+                .valueOf(raw.probabilidad())
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue();
+
+        return new PredictionWithFeaturesDTO(
+                raw.prevision(),
+                rounded,
+                raw.clima()
+        );
     }
 }
