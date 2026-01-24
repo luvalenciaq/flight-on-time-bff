@@ -2,6 +2,7 @@ package com.flightontime.bff.service;
 
 import com.flightontime.bff.config.CoreServiceProperties;
 import com.flightontime.bff.dto.FlightRequestDTO;
+import com.flightontime.bff.dto.FlightResponseDTO;
 import com.flightontime.bff.dto.PredictionResponseDTO;
 import com.flightontime.bff.dto.PredictionWithFeaturesDTO;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -75,4 +77,18 @@ public class PredictionClientService {
                 raw.clima()
         );
     }
+    public List<FlightResponseDTO> getAllFlights() {
+
+        String url = props.getUrl() + "/internal/flights";
+
+        ResponseEntity<FlightResponseDTO[]> response =
+                restTemplate.getForEntity(url, FlightResponseDTO[].class);
+
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            return List.of();
+        }
+
+        return List.of(response.getBody());
+    }
+
 }

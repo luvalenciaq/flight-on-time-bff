@@ -1,6 +1,7 @@
 package com.flightontime.bff.controller;
 
 import com.flightontime.bff.dto.FlightRequestDTO;
+import com.flightontime.bff.dto.FlightResponseDTO;
 import com.flightontime.bff.dto.PredictionResponseDTO;
 import com.flightontime.bff.dto.PredictionWithFeaturesDTO;
 import com.flightontime.bff.service.PredictionClientService;
@@ -12,13 +13,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/predict")
+@RequestMapping
 @RequiredArgsConstructor
 public class PredictionController {
 
@@ -30,16 +30,22 @@ public class PredictionController {
             @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos", content = @Content),
             @ApiResponse(responseCode = "500", description = "Error interno del servidor", content = @Content)
     })
-    @PostMapping
+    @PostMapping("/predict")
     public ResponseEntity<PredictionResponseDTO> predict(@Valid @RequestBody FlightRequestDTO dto) {
         return ResponseEntity.ok(predictionClientService.predict(dto));
     }
 
     @Operation(summary = "Predecir puntualidad con datos climáticos")
-    @PostMapping("/detailed")
+    @PostMapping("predict/detailed")
     public ResponseEntity<PredictionWithFeaturesDTO> predictDetailed(
             @Valid @RequestBody FlightRequestDTO dto
     ) {
         return ResponseEntity.ok(predictionClientService.predictWithWeather(dto));
     }
+    @Operation(summary = "Listar vuelos", description = "Obtiene todos los vuelos guardados con sus predicciones desde el core")
+    @GetMapping("/flights")
+    public ResponseEntity<List<FlightResponseDTO>> getAllFlights() {
+        return ResponseEntity.ok(predictionClientService.getAllFlights());
+    }
+
 }
