@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDateTime;
 
@@ -34,7 +35,6 @@ public record FlightRequestDTO(
         @NotNull(message = "La fecha de partida es obligatoria")
         @JsonProperty("fecha_partida")
         LocalDateTime fechaPartida
-
 ) {
 
         public FlightRequestDTO {
