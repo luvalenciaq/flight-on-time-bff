@@ -35,8 +35,6 @@ public record FlightRequestDTO(
         @NotNull(message = "La fecha de partida es obligatoria")
         @JsonProperty("fecha_partida")
         LocalDateTime fechaPartida
-
-
 ) {
 
         public FlightRequestDTO {

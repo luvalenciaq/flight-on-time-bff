@@ -1,5 +1,6 @@
 package com.flightontime.bff.exception;
 
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -16,7 +17,6 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     /**
      * Maneja errores de validación de Bean Validation
      * (@NotBlank, @Size, @Pattern, @Positive, etc.)
