@@ -53,14 +53,16 @@ public class PredictionClientService {
     public PredictionWithFeaturesDTO predictWithWeather(FlightRequestDTO dto) {
         // Construir URL con query parameter
         String url = props.getUrl() + "/internal/predict/detailed";
-        ResponseEntity<String> rawResponse = restTemplate.postForEntity(url, dto, String.class);
-        System.out.println(rawResponse.getBody());
-
+        
         PredictionWithFeaturesDTO raw = restTemplate.postForObject(
                 url,
                 dto,
                 PredictionWithFeaturesDTO.class
         );
+
+        if (raw != null) {
+            System.out.println("Respuesta del Core: " + raw);
+        }
 
         if (raw == null) {
             return null;
